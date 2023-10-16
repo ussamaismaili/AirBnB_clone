@@ -62,10 +62,8 @@ class BaseModel:
             "__class__" key with the class name. Datetime objects are
             converted to ISO formatted strings.
         """
-        mydict = self.__dict__
+        mydict = self.__dict__.copy()
         mydict["__class__"] = self.__class__.__name__
-        if not isinstance(mydict["created_at"], str):
-            mydict["created_at"] = mydict["created_at"].isoformat()
-        if not isinstance(mydict["updated_at"], str):
-            mydict["updated_at"] = mydict["updated_at"].isoformat()
+        mydict["created_at"] = mydict["created_at"].isoformat()
+        mydict["updated_at"] = mydict["updated_at"].isoformat()
         return mydict
