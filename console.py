@@ -20,13 +20,12 @@ class HBNBCommand(cmd.Cmd):
     all_class = ["BaseModel", "User", "State",
                  "City", "Amenity", "Place", "Review"]
 
-   
-    attr_float = ["latitude", "longitude"]
-    attr_int = ["number_rooms", "number_bathrooms",
-                "max_guest", "price_by_night"]
     attr_str = ["name", "amenity_id", "place_id", "state_id",
                 "user_id", "city_id", "description", "text",
                 "email", "password", "first_name", "last_name"]
+    attr_int = ["number_rooms", "number_bathrooms",
+                "max_guest", "price_by_night"]
+    attr_float = ["latitude", "longitude"]
 
     def do_quit(self, arg):
         """exit the program
@@ -112,7 +111,24 @@ class HBNBCommand(cmd.Cmd):
         Usage: update <class name> <id> <attribute name> "<attribute value>"
 
         """
-        pass
+        if self.valid(arg, True, True):
+            args = arg.split()
+            _key = args[0] + "." + args[1]
+            if args[3].startswith('"'):
+                match = re.search(r'"([^"]+)"', arg).group(1)
+            elif args[3].startswith("'"):
+                match = re.search(r'\'([^\']+)\'', arg).group(1)
+            else:
+                match = args[3]
+            if args[2] in HBNBCommand.attr_str:
+                setattr(storage.all()[_key], args[2], str(match))
+            elif args[2] in HBNBCommand.attr_int:
+                setattr(storage.all()[_key], args[2], int(match))
+            elif args[2] in HBNBCommand.attr_float:
+                setattr(storage.all()[_key], args[2], float(match))
+            else:
+                setattr(storage.all()[_key], args[2], self.casting(match))
+            storage.save()
 
     def do_clear(self, arg):
         """Clear data storage :
@@ -160,13 +176,41 @@ class HBNBCommand(cmd.Cmd):
 
     def count(self, arg):
         """the number of instances of a class
-        Usage: <class name>.count()
-        """
-        count = 0
-        for key in storage.all():
-            if arg[:-1] in key:
-                count += 1
-        print(count)
+        Usage: <class name>.count()"""
+        pass
+
+    def _exec(self, arg):
+        """helper function parsing filtring replacing"""
+        methods = {
+            "all": self.do_all,
+            "count": self.count,
+            "show": self.do_show,
+            "destroy": self.do_destroy,
+            "update": self.do_update,
+            "create": self.do_create
+        }
+        match = re.findall(r"^(\w+)\.(\w+)\((.*)\)", arg)
+        args = match[0][0]+" "+match[0][2]
+        _list = args.split(", ")
+        _list[0] = _list[0].replace('"', "").replace("'", "")
+        if len(_list) > 1:
+            _list[1] = _list[1].replace('"', "").replace("'", "")
+        args = " ".join(_list)
+        if match[0][1] in methods:
+            methods[match[0][1]](args)
+
+    def default(self, arg):
+        """default if there no command found"""
+        match = re.findall(r"^(\w+)\.(\w+)\((.*)\)", arg)
+        if len(match) != 0 and match[0][1] == "update" and "{" in arg:
+            _dict = re.search(r'{([^}]+)}', arg).group()
+            _dict = json.loads(_dict.replace("'", '"'))
+            for k, v in _dict.items():
+                _arg = arg.split("{")[0]+k+", "+str(v)+")"
+                self._exec(_arg)
+        elif len(match) != 0:
+            self._exec(arg)
+
 
 if __name__ == "__main__":
     HBNBCommand().cmdloop()
