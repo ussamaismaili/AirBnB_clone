@@ -3,6 +3,12 @@
 import json
 import os
 from models.base_model import BaseModel
+from models.user import User
+from models.state import State
+from models.city import City
+from models.place import Place
+from models.amenity import Amenity
+from models.review import Review
 
 class FileStorage:
     """ The FileStorage class manages the storage and retrieval of data in
@@ -44,5 +50,17 @@ class FileStorage:
                     for key, value in json.load(f).items():
                         if "BaseModel" in key:
                             data[key] = BaseModel(**value)
+                        if "User" in key:
+                            data[key] = User(**value)
+                        if "Place" in key:
+                            data[key] = Place(**value)
+                        if "State" in key:
+                            data[key] = State(**value)
+                        if "City" in key:
+                            data[key] = City(**value)
+                        if "Amenity" in key:
+                            data[key] = Amenity(**value)
+                        if "Review" in key:
+                            data[key] = Review(**value)
             except Exception:
                 pass
