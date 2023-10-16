@@ -19,6 +19,9 @@ class BaseModel:
             *args: Variable number of positional arguments.
             **kwargs: Keyword arguments.
         """
+        self.id = str(uuid4())
+        self.created_at = datetime.now()
+        self.updated_at = datetime.now()
         if len(kwargs) > 0:
             for key, value in kwargs.items():
                 if key != "__class__":
@@ -28,9 +31,6 @@ class BaseModel:
                     else:
                         self.__dict__[key] = value
         else:
-            self.id = str(uuid4())
-            self.created_at = datetime.now()
-            self.updated_at = datetime.now()
             models.storage.new(self)
 
     def __str__(self):
