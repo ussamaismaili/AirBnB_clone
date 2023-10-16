@@ -51,7 +51,6 @@ class BaseModel:
             None
         """
         self.updated_at = datetime.now()
-        models.storage.save()
 
     def to_dict(self):
         """
@@ -64,6 +63,8 @@ class BaseModel:
         """
         mydict = self.__dict__.copy()
         mydict["__class__"] = self.__class__.__name__
-        mydict["created_at"] = mydict["created_at"].isoformat()
-        mydict["updated_at"] = mydict["updated_at"].isoformat()
+        if not isinstance(mydict["created_at"], str):
+            mydict["created_at"] = mydict["created_at"].isoformat()
+        if not isinstance(mydict["updated_at"], str):
+            mydict["updated_at"] = mydict["updated_at"].isoformat()
         return mydict
