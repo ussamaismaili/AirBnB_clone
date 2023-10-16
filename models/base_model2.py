@@ -6,7 +6,7 @@ handling of these aspects.
 """
 from datetime import datetime
 from uuid import uuid4
-
+import models
 
 class BaseModel:
     """
@@ -30,6 +30,8 @@ class BaseModel:
                         self.__dict__[key] = datetime.strptime(value, format)
                     else:
                         self.__dict__[key] = value
+        else:
+            models.storage.new(self)
 
     def __str__(self):
         """
@@ -48,15 +50,11 @@ class BaseModel:
             None
         """
         self.updated_at = datetime.now()
+        models.storage.save()
 
     def to_dict(self):
         """
         Returns a dictionary representation of the object.
-
-        Returns:
-            dict: A dictionary containing the object's attributes and the
-            "__class__" key with the class name. Datetime objects are
-            converted to ISO formatted strings.
         """
         mydict = self.__dict__
         mydict["__class__"] = self.__class__.__name__
