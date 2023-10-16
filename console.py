@@ -24,6 +24,11 @@ class HBNBCommand(cmd.Cmd):
         """
         pass
 
+    def help(self):
+        """An empty line + ENTER shouldnt execute anything
+        """
+        pass
+
 
 if __name__ == "__main__":
     HBNBCommand().cmdloop()
