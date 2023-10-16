@@ -14,19 +14,19 @@ import json
 
 
 class HBNBCommand(cmd.Cmd):
-    """AirBnB console """
+    """Class for the console AirBnB"""
     prompt = "(hbnb) "
 
     all_class = ["BaseModel", "User", "State",
                  "City", "Amenity", "Place", "Review"]
 
+   
     attr_float = ["latitude", "longitude"]
     attr_int = ["number_rooms", "number_bathrooms",
                 "max_guest", "price_by_night"]
     attr_str = ["name", "amenity_id", "place_id", "state_id",
                 "user_id", "city_id", "description", "text",
                 "email", "password", "first_name", "last_name"]
-
 
     def do_quit(self, arg):
         """exit the program
@@ -112,24 +112,61 @@ class HBNBCommand(cmd.Cmd):
         Usage: update <class name> <id> <attribute name> "<attribute value>"
 
         """
-        if self.valid(arg, True, True):
-            args = arg.split()
-            _key = args[0] + "." + args[1]
-            if args[3].startswith('"'):
-                match = re.search(r'"([^"]+)"', arg).group(1)
-            elif args[3].startswith("'"):
-                match = re.search(r'\'([^\']+)\'', arg).group(1)
+        pass
+
+    def do_clear(self, arg):
+        """Clear data storage :
+        Usage: clear
+        """
+        storage.all().clear()
+        self.do_all(arg)
+        print("** All data been clear! **")
+
+    def valid(self, arg, _id_flag=False, _att_flag=False):
+        """validation of argument that pass to commands
+        """
+        args = arg.split()
+        _len = len(arg.split())
+        if _len == 0:
+            print("** class name missing **")
+            return False
+        if args[0] not in HBNBCommand.all_class:
+            print("** class doesn't exist **")
+            return False
+        if _len < 2 and _id_flag:
+            print("** instance id missing **")
+            return False
+        if _id_flag and args[0]+"."+args[1] not in storage.all():
+            print("** no instance found **")
+            return False
+        if _len == 2 and _att_flag:
+            print("** attribute name missing **")
+            return False
+        if _len == 3 and _att_flag:
+            print("** value missing **")
+            return False
+        return True
+
+    def casting(self, arg):
+        """cast string to float or int if possible"""
+        try:
+            if "." in arg:
+                arg = float(arg)
             else:
-                match = args[3]
-            if args[2] in HBNBCommand.attr_str:
-                setattr(storage.all()[_key], args[2], str(match))
-            elif args[2] in HBNBCommand.attr_int:
-                setattr(storage.all()[_key], args[2], int(match))
-            elif args[2] in HBNBCommand.attr_float:
-                setattr(storage.all()[_key], args[2], float(match))
-            else:
-                setattr(storage.all()[_key], args[2], self.casting(match))
-            storage.save()
+                arg = int(arg)
+        except ValueError:
+            pass
+        return arg
+
+    def count(self, arg):
+        """the number of instances of a class
+        Usage: <class name>.count()
+        """
+        count = 0
+        for key in storage.all():
+            if arg[:-1] in key:
+                count += 1
+        print(count)
 
 if __name__ == "__main__":
     HBNBCommand().cmdloop()
