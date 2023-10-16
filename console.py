@@ -19,10 +19,10 @@ class HBNBCommand(cmd.Cmd):
         print()
         return True
 
-    # def emptyline(self):
-    #     """An empty line + ENTER shouldnt execute anything
-    #     """
-    #     pass
+    def emptyline(self):
+        """An empty line + ENTER shouldnt execute anything
+        """
+        pass
 
 
 if __name__ == "__main__":
