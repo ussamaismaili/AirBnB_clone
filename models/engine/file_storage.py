@@ -10,15 +10,17 @@ from models.place import Place
 from models.amenity import Amenity
 from models.review import Review
 
+
 class FileStorage:
     """ The FileStorage class manages the storage and retrieval of data in
-    a file, as evident from the save, reload, and new methods 
+    a file, as evident from the save, reload, and new methods
     """
     __file_path = "file.json"
     __objects = {}
 
     def all(self):
-        """ This method returns all the objects stored in the __objects dictionary.
+        """ This method returns all the objects
+        stored in the __objects dictionary.
         """
         return FileStorage.__objects
 
