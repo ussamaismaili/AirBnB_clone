@@ -57,7 +57,7 @@ class HBNBCommand(cmd.Cmd):
             "Amenity": Amenity,
             "Review": Review
         }
-        if self.valid(arg):
+        if self.checker(arg):
             args = arg.split()
             if args[0] in classes:
                 new = classes[args[0]]()
@@ -69,7 +69,7 @@ class HBNBCommand(cmd.Cmd):
         on the class name and id
         Usage: show <class name> <id>
         """
-        if self.valid(arg, True):
+        if self.checker(arg, True):
             args = arg.split()
             _key = args[0]+"."+args[1]
             print(storage.all()[_key])
@@ -79,7 +79,7 @@ class HBNBCommand(cmd.Cmd):
         (save the change into the JSON file)
         Usage: destroy <class name> <id>
         """
-        if self.valid(arg, True):
+        if self.checker(arg, True):
             args = arg.split()
             _key = args[0]+"."+args[1]
             del storage.all()[_key]
@@ -111,7 +111,7 @@ class HBNBCommand(cmd.Cmd):
         Usage: update <class name> <id> <attribute name> "<attribute value>"
 
         """
-        if self.valid(arg, True, True):
+        if self.checker(arg, True, True):
             args = arg.split()
             _key = args[0] + "." + args[1]
             if args[3].startswith('"'):
@@ -138,29 +138,35 @@ class HBNBCommand(cmd.Cmd):
         self.do_all(arg)
         print("** All data been clear! **")
 
-    def valid(self, arg, _id_flag=False, _att_flag=False):
-        """validation of argument that pass to commands
-        """
+    def checker(self, arg, _ck_id=False, _ck_att=False):
         args = arg.split()
-        _len = len(arg.split())
+        _len = len(args)
+        _id = args[0] + "." + args[1]
+
         if _len == 0:
             print("** class name missing **")
             return False
+
         if args[0] not in HBNBCommand.all_class:
             print("** class doesn't exist **")
             return False
-        if _len < 2 and _id_flag:
+
+        if _len < 2 and _ck_id:
+            print("** instance id missing ** ")
+            return False
+
+        if _ck_id and _id not in storage.all:
             print("** instance id missing **")
             return False
-        if _id_flag and args[0]+"."+args[1] not in storage.all():
-            print("** no instance found **")
-            return False
-        if _len == 2 and _att_flag:
+
+        if _len == 2 and _ck_att:
             print("** attribute name missing **")
             return False
-        if _len == 3 and _att_flag:
+
+        if _len == 3 and _ck_att:
             print("** value missing **")
             return False
+
         return True
 
     def casting(self, arg):
@@ -210,6 +216,16 @@ class HBNBCommand(cmd.Cmd):
                 self._exec(_arg)
         elif len(match) != 0:
             self._exec(arg)
+
+    def count(self, arg):
+        """the number of instances of a class
+        Usage: <class name>.count()
+        """
+        count = 0
+        for key in storage.all():
+            if arg[:-1] in key:
+                count += 1
+        print(count)
 
 
 if __name__ == "__main__":
