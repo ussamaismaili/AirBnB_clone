@@ -141,7 +141,6 @@ class HBNBCommand(cmd.Cmd):
     def checker(self, arg, _ck_id=False, _ck_att=False):
         args = arg.split()
         _len = len(args)
-        _id = args[0] + "." + args[1]
 
         if _len == 0:
             print("** class name missing **")
@@ -155,7 +154,7 @@ class HBNBCommand(cmd.Cmd):
             print("** instance id missing ** ")
             return False
 
-        if _ck_id and _id not in storage.all:
+        if _ck_id and args[0] + "." + args[1] not in storage.all:
             print("** instance id missing **")
             return False
 
